@@ -1,0 +1,9 @@
+.NewPackage{
+    float:right;
+   margin: 5px;
+}
+.TableData{
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+}
