@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react'
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
-import Container from 'react-bootstrap/Container';
 import Badge from 'react-bootstrap/Badge';
 import './App.css'
 import AddNewPackage from './AddNewPackage';
@@ -27,10 +24,11 @@ function App() {
   const handleLocationClose = () => setUpdateLocationShow(false)
   const handleLocationShow = () => setUpdateLocationShow(true)
 
-  const [PackageData, setPackageData] = useState({ SenderName: '', ReciverName: '', SourceLocation: "", DestinationLocation: "", CurrentLocation: "", Status: "Shipped" });
+  const [PackageData, setPackageData] = useState({ id: "", SenderName: '', ReciverName: '', SourceLocation: "", DestinationLocation: "", CurrentLocation: "", Status: "Shipped" });
 
   const [lists, setLists] = useState([])
   const [currentLocation, setCurrentLocation] = useState("")
+  const [currentId, setCurrentId] = useState('')
 
   const handlePackageInputChange = (e) => {
     const { name, value } = e.target;
@@ -42,14 +40,27 @@ function App() {
   }
 
   const handleAddNewPackage = () => {
+    PackageData["id"] = lists.length + 1
     const newData = [...lists, PackageData];
     localStorage.setItem("tableData", JSON.stringify(newData))
     handleClose()
     window.location.reload()
   }
   const handleLocationSave = () => {
-
+    const modifiedData = lists.map(obj => {
+      if (obj.id === currentId) {
+        return { ...obj, SourceLocation: currentLocation.CurrentLocation };
+      }
+      return obj;
+    });
+    localStorage.setItem("tableData", JSON.stringify(modifiedData))
     handleLocationClose()
+    window.location.reload()
+  }
+
+  const handleLocationEdit = (id) => {
+    handleLocationShow()
+    setCurrentId(id)
   }
 
   useEffect(() => {
@@ -73,7 +84,7 @@ function App() {
           <tbody>
             {
               lists?.map((current) => {
-                return (<tr>
+                return (<tr id={current.id} key={current.id}>
                   <td>
                     <div className='TableData'>
                       <label><b>No: {Math.floor(Math.random() * 100)}</b></label>
@@ -86,19 +97,17 @@ function App() {
                   <td>
                     <div className='TableData'>
                       <Button style={{ marginBottom: "5px", width: "200px" }} variant="primary" onClick={handleStatusShow}>Update Status</Button>
-                      <Button style={{ marginBottom: "5px", width: "200px" }} variant="primary" onClick={handleLocationShow}>Update Location</Button>
+                      <Button style={{ marginBottom: "5px", width: "200px" }} variant="primary" onClick={() => handleLocationEdit(current.id)} >Update Location</Button>
                     </div>
                   </td>
                 </tr>)
-
               })
             }
-
           </tbody>
         </Table>
         <AddNewPackage show={show} handleClose={handleClose} handlePackageInputChange={handlePackageInputChange} handleAddNewPackage={handleAddNewPackage}> </AddNewPackage>
         <UpdateStatus updateStatusShow={updateStatusShow} handleStatusClose={handleStatusClose}></UpdateStatus>
-        <UpdateLocation updateLocationShow={updateLocationShow} handleLocationClose={handleLocationClose} handleLocationChange={handleLocationChange} handleLocationSave={handleLocationSave}></UpdateLocation>
+        <UpdateLocation updateLocationShow={updateLocationShow} handleLocationClose={handleLocationClose} handleLocationChange={handleLocationChange} handleLocationSave={handleLocationSave} ></UpdateLocation>
       </div>
     </>
   )

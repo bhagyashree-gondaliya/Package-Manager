@@ -8,7 +8,14 @@ import Col from 'react-bootstrap/Col';
 import Dropdown from 'react-bootstrap/Dropdown';
 
 const UpdateStatus = (props) => {
-    <Modal show={props.updateStatusShow} onHide={props.handleStatusClose}>
+    const [selectedValue, setSelectedValue] = useState('');
+
+    const handleDropdownChange = (e, eventKey) => {
+        e.preventDefualt()
+        setSelectedValue(eventKey);
+    };
+
+    return <Modal show={props.updateStatusShow} onHide={props.handleStatusClose}>
         <Modal.Header closeButton>
             <Modal.Title>Update Status</Modal.Title>
         </Modal.Header>
@@ -18,7 +25,7 @@ const UpdateStatus = (props) => {
                     <Row>
                         <Col><Form.Group className="mb-3" controlId="senderName">
                             <Form.Label>Status:</Form.Label>
-                            <Dropdown>
+                            <Dropdown onSelect={handleDropdownChange}>
                                 <Dropdown.Toggle id="dropdown-basic">
                                     Shipped
                                 </Dropdown.Toggle>
